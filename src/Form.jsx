@@ -1,11 +1,29 @@
 import { useState } from "react";
 import {useForm} from "react-hook-form";
 import './style.css';
+import { MapContainer, TileLayer, useMap, Marker, Popup } from 'react-leaflet'
+import "leaflet/dist/leaflet.css"
 
-export default function AddWorker(add,chooseone){
+
+
+export default function AddWorker(add){//
     const [query, setQuery] = useState("");
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState([])
+    const [position, setPosition] = useState([32.0877639,34.8859985]);
+    function chooseone(item){
+          
+      setValue("addres",item.display_name);
+      setResult([]);
+      setPosition([parseFloat(item.lat),parseFloat(item.lon)])
+      setValue("status","found");
+      
+  }
+      const MapUpdater = () => {
+          const map = useMap();
+          map.setView(position, 13); // עדכון המפה עם המיקום החדש
+          return null;
+        };
   
     let {register, handleSubmit,formState:{isValid,errors}, setValue }= useForm({
         mode:"all"
@@ -69,7 +87,20 @@ export default function AddWorker(add,chooseone){
 
             <input type="submit" disabled={!isValid}/>
             </form>
-            
+            <div className="map-container">
+        <MapContainer className="map" center={position} zoom={13} style={{ height: "400px", width: "100%", display:"flex" }} scrollWheelZoom={false}>
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          <MapUpdater />
+          <Marker position={position}>
+            <Popup>
+              מיקום: {position[0]}, {position[1]}
+            </Popup>
+          </Marker>
+        </MapContainer>
+        </div>
             
     
     
